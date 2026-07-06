@@ -3,7 +3,7 @@ from pathlib import Path
 
 from src.experiment import protection_sweep
 from src.network import base_network
-from src.plots import sensitivity_plot, tradeoff_plot
+from src.plots import network_diagram, sensitivity_plot, tradeoff_plot
 from src.scenarios import pair_failures, single_node_failures
 from src.sensitivity import run_sensitivity
 
@@ -41,8 +41,9 @@ def main(out_dir="results"):
             for row in sweep:
                 writer.writerow([variant, row["level"], row["spend"], row["worst_satisfaction"]])
 
-    tradeoff_plot(singles, out / "tradeoff.png")
+    tradeoff_plot(singles, pairs, out / "tradeoff.png")
     sensitivity_plot(sensitivity, out / "sensitivity.png")
+    network_diagram(net, out / "network.png")
 
     unprotected = singles[0]
     fully_protected_level = next(

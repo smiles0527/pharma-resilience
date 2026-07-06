@@ -5,7 +5,7 @@ from run import LEVELS, main
 
 def test_main_writes_all_outputs(tmp_path):
     main(out_dir=tmp_path)
-    for name in ["sweep.csv", "sensitivity.csv", "tradeoff.png", "sensitivity.png"]:
+    for name in ["sweep.csv", "sensitivity.csv", "tradeoff.png", "sensitivity.png", "network.png"]:
         assert (tmp_path / name).exists(), f"missing {name}"
     with open(tmp_path / "sweep.csv", newline="") as f:
         rows = list(csv.DictReader(f))
