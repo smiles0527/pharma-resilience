@@ -65,7 +65,8 @@ datasets/
 *.nc
 
 outputs/
-results/
+results/*
+!results/*.png
 figures/generated/
 plots/generated/
 reports/generated/
