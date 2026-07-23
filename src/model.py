@@ -40,4 +40,5 @@ def solve(network):
         "flows": {a: flow[a].value() for a in arcs},
         "unmet": unmet_values,
         "satisfaction": 1 - total_unmet / total_demand,
+        "min_fill_rate": min(1 - unmet_values[h] / demand[h] for h in hospitals),
     }

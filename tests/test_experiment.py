@@ -58,6 +58,14 @@ def test_evaluate_scenarios_reports_nonnegative_recovery_cost():
         assert 0.0 <= row["satisfaction"] < 1.0
 
 
+def test_evaluate_scenarios_reports_cost_and_equity():
+    net = base_network()
+    rows = evaluate_scenarios(net, single_node_failures(net))
+    for row in rows:
+        assert row["cost"] > 0
+        assert 0.0 <= row["min_fill_rate"] <= row["satisfaction"] + 1e-9
+
+
 def test_worst_case_picks_minimum_satisfaction():
     rows = [
         {"failed": ("A",), "satisfaction": 0.9, "recovery_cost": 1.0},

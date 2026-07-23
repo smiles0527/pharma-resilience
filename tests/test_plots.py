@@ -1,6 +1,7 @@
 from src.network import base_network
 from src.plots import (
     coinciding_variants,
+    frontier_plot,
     network_diagram,
     sensitivity_plot,
     tradeoff_plot,
@@ -48,6 +49,19 @@ def test_sensitivity_plot_writes_file(tmp_path):
 def test_coinciding_variants_folds_identical_curves_only():
     variants = {"base": SWEEP, "cost_x1.2": list(SWEEP), "capacity_x0.8": SHIFTED}
     assert coinciding_variants(variants) == ["cost_x1.2"]
+
+
+FRONTIER = [
+    {"target": 0.8, "spend": 27.0, "worst_satisfaction": 0.8, "iterations": 4},
+    {"target": 1.0, "spend": 170.0, "worst_satisfaction": 1.0, "iterations": 9},
+]
+
+
+def test_frontier_plot_writes_file(tmp_path):
+    out = tmp_path / "frontier.png"
+    frontier_plot(SWEEP, FRONTIER, out)
+    assert out.exists()
+    assert out.stat().st_size > 0
 
 
 def test_network_diagram_writes_file(tmp_path):

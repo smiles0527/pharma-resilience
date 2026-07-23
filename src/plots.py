@@ -116,6 +116,54 @@ def tradeoff_plot(singles, pairs, path):
     plt.close(fig)
 
 
+def frontier_plot(uniform_sweep, frontier, path):
+    fig, ax = _styled_axes((7.5, 4.5))
+    ax.axhline(1.0, color=BASELINE, linewidth=1, zorder=1)
+    _line(ax, uniform_sweep, SINGLE_COLOR, "uniform protection")
+    ax.plot(
+        [row["spend"] for row in frontier],
+        [row["worst_satisfaction"] for row in frontier],
+        color=PAIR_COLOR,
+        linewidth=2,
+        marker="o",
+        markersize=6,
+        markeredgecolor="white",
+        markeredgewidth=1.5,
+        label="optimized allocation (C&CG)",
+        solid_joinstyle="round",
+    )
+    _end_label(ax, uniform_sweep, "uniform")
+    last = frontier[-1]
+    ax.annotate(
+        "optimized",
+        (last["spend"], last["worst_satisfaction"]),
+        xytext=(8, -12),
+        textcoords="offset points",
+        fontsize=8.5,
+        color=SECONDARY_INK,
+        va="center",
+    )
+    ax.set_xlabel("Protection spend", fontsize=10.5, color=SECONDARY_INK)
+    ax.set_ylabel("Worst-case demand satisfaction", fontsize=10.5, color=SECONDARY_INK)
+    ax.set_title(
+        "Uniform protection vs. optimized allocation",
+        fontsize=12,
+        color=INK,
+        loc="left",
+        pad=12,
+    )
+    ax.yaxis.set_major_formatter(PercentFormatter(xmax=1, decimals=0))
+    floor = min(
+        [row["worst_satisfaction"] for row in uniform_sweep]
+        + [row["worst_satisfaction"] for row in frontier]
+    )
+    ax.set_ylim(max(0.0, floor - 0.08), 1.06)
+    ax.margins(x=0.1)
+    ax.legend(frameon=False, fontsize=9, labelcolor=SECONDARY_INK, loc="lower right")
+    fig.savefig(path, bbox_inches="tight")
+    plt.close(fig)
+
+
 def coinciding_variants(variants):
     base_curve = [row["worst_satisfaction"] for row in variants["base"]]
     return [

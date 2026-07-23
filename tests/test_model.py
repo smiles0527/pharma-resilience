@@ -56,3 +56,17 @@ def test_destroyed_node_reports_shortage_not_infeasible():
     result = solve(net)
     assert result["status"] == "Optimal"
     assert result["satisfaction"] < 1.0
+
+
+def test_min_fill_rate_matches_satisfaction_for_single_hospital():
+    result = solve(toy_chain(supplier_cap=4))
+    assert result["min_fill_rate"] == pytest.approx(0.4)
+
+
+def test_min_fill_rate_is_zero_when_a_hospital_is_disconnected():
+    net = base_network()
+    net["capacity"]["W1"] = 0
+    net["capacity"]["W2"] = 0
+    result = solve(net)
+    assert result["satisfaction"] > 0.3
+    assert result["min_fill_rate"] == pytest.approx(0.0)

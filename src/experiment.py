@@ -29,6 +29,8 @@ def evaluate_scenarios(network, scenarios):
         rows.append({
             "failed": nodes,
             "satisfaction": result["satisfaction"],
+            "min_fill_rate": result["min_fill_rate"],
+            "cost": result["cost"],
             "recovery_cost": result["cost"] - intact_cost,
         })
     return rows
