@@ -11,7 +11,7 @@ def read_rows(path):
 def test_main_writes_all_outputs(tmp_path):
     main(out_dir=tmp_path)
     names = [
-        "sweep.csv", "sensitivity.csv", "frontier.csv", "plans.csv",
+        "sweep.csv", "sensitivity.csv", "frontier.csv", "plans.csv", "paradox.csv",
         "tradeoff.png", "sensitivity.png", "frontier.png", "network.png",
     ]
     for name in names:
@@ -35,3 +35,13 @@ def test_main_writes_all_outputs(tmp_path):
             float(row["satisfaction_robust"])
             >= float(row["satisfaction_normal"]) - 1e-9
         )
+
+    paradox = {row["plan"]: row for row in read_rows(tmp_path / "paradox.csv")}
+    assert (
+        float(paradox["protected"]["satisfaction"])
+        > float(paradox["unprotected"]["satisfaction"])
+    )
+    assert (
+        float(paradox["protected"]["min_fill_rate"])
+        < float(paradox["unprotected"]["min_fill_rate"])
+    )

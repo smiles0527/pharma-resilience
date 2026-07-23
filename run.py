@@ -2,14 +2,17 @@ import csv
 from pathlib import Path
 
 from src.experiment import evaluate_scenarios, protection_sweep, worst_case
-from src.network import base_network
+from src.model import solve
+from src.network import base_network, equity_paradox_network
 from src.plots import frontier_plot, network_diagram, sensitivity_plot, tradeoff_plot
-from src.robust import apply_allocation, ccg_plan
+from src.robust import apply_allocation, ccg_plan, min_spend_plan
 from src.scenarios import pair_failures, single_node_failures
 from src.sensitivity import run_sensitivity
 
 LEVELS = [round(i * 0.05, 2) for i in range(11)]
 TARGETS = [0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
+PARADOX_TARGET = 0.55
+PARADOX_SCENARIOS = [("W2",)]
 
 
 def main(out_dir="results"):
@@ -82,6 +85,22 @@ def main(out_dir="results"):
                 normal["min_fill_rate"], normal["recovery_cost"],
                 robust["cost"], robust["satisfaction"],
                 robust["min_fill_rate"], robust["recovery_cost"],
+            ])
+
+    paradox_net = equity_paradox_network()
+    paradox_plan = min_spend_plan(paradox_net, PARADOX_SCENARIOS, PARADOX_TARGET)
+    paradox_rows = [
+        ("unprotected", 0.0, solve(paradox_net)),
+        ("protected", paradox_plan["spend"],
+         solve(apply_allocation(paradox_net, paradox_plan["extra"]))),
+    ]
+
+    with open(out / "paradox.csv", "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["plan", "spend", "satisfaction", "min_fill_rate"])
+        for name, spend, result in paradox_rows:
+            writer.writerow([
+                name, spend, result["satisfaction"], result["min_fill_rate"],
             ])
 
     tradeoff_plot(singles, pairs, out / "tradeoff.png")

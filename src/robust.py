@@ -17,15 +17,16 @@ def apply_allocation(network, extra):
     return protected
 
 
-def min_spend_plan(network, scenarios, target):
+def min_spend_plan(network, scenarios, target, integer=False):
     nodes = _protectable(network)
     arcs = network["arc_cost"]
     hospitals = network["hospitals"]
     demand = network["demand"]
     total_demand = sum(demand.values())
+    category = "Integer" if integer else "Continuous"
 
     prob = pulp.LpProblem("min_protection_spend", pulp.LpMinimize)
-    extra = {n: pulp.LpVariable(f"e_{n}", lowBound=0) for n in nodes}
+    extra = {n: pulp.LpVariable(f"e_{n}", lowBound=0, cat=category) for n in nodes}
     prob += network["protection_cost_rate"] * pulp.lpSum(extra.values())
 
     for i, failed in enumerate(scenarios):
